@@ -10,11 +10,9 @@ fun main() =
     runBlocking {
         println("Main starts: ${Thread.currentThread().name}") // main thread
 
-        // worker coroutine
-        // output didn't print?
-        // When a coroutine is launched, the application
-        // does not know if it needs to wait for the coroutine to finish!
-        GlobalScope.launch { //Thread t1
+        // Because we didn't specify GlobalScope, launch scope was within
+        // the runBlockin Scope!!
+        val job: Job = launch { //Thread t1
             println("fake work: ${Thread.currentThread().name}")
 //        Thread.sleep(1000)
             // It is then better to use delay function
@@ -23,8 +21,14 @@ fun main() =
             // When resumed, this println might be on another thread
             println("fake work finished: ${Thread.currentThread().name}") // either T1 or some other
         }
+
+        // With the job object, we can control the coroutine
         // RunBlocking creates a coroutine that blocks the main thread
-        mySuspendFunc(2000)
+        //mySuspendFunc(2000)
+        // We can also cancel with job.cancel()
+        // So instead of waiting for 2 seconds, we can use job.join()
+        job.join()
+
         println("Main ends: ${Thread.currentThread().name}") // main thread
 }
 
