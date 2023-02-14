@@ -12,14 +12,15 @@ fun main() =
 
         // Because we didn't specify GlobalScope, launch scope was within
         // the runBlockin Scope!!
-        val job: Job = launch { //Thread t1
+        val jobDeferred: Deferred<Int> = async { //Thread t1
             println("fake work: ${Thread.currentThread().name}")
 //        Thread.sleep(1000)
             // It is then better to use delay function
             // Coroutine will be suspended in this case for 1 sec
-            mySuspendFunc(1000)
+            delay(1000)
             // When resumed, this println might be on another thread
             println("fake work finished: ${Thread.currentThread().name}") // either T1 or some other
+            15
         }
 
         // With the job object, we can control the coroutine
@@ -27,12 +28,16 @@ fun main() =
         //mySuspendFunc(2000)
         // We can also cancel with job.cancel()
         // So instead of waiting for 2 seconds, we can use job.join()
-        job.join()
+        jobDeferred.join()
+        // Job await returns the result of the async deferred job object
+        val fifteen = jobDeferred.await()
+        println(fifteen)
 
         println("Main ends: ${Thread.currentThread().name}") // main thread
 }
 
-suspend fun mySuspendFunc(time: Long) {
+suspend fun mySuspendFunc() {
     // code
-    delay(time)
+    // dummy operation
+    delay(1000) // do something
 }
